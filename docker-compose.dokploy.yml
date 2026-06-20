@@ -15,6 +15,7 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
       PORT: 3001
     ports:
       - "3001:3001"
