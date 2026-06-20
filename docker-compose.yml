@@ -1,0 +1,48 @@
+services:
+  database:
+    image: postgres:16
+    container_name: projeto_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: projeto
+      POSTGRES_PASSWORD: projeto123
+      POSTGRES_DB: projeto_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+
+  backend:
+    image: node:20-alpine
+    container_name: projeto_backend
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./backend:/app
+    command: sh -c "npm install && npm start"
+    environment:
+      DATABASE_URL: postgresql://projeto:projeto123@database:5432/projeto_db
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - database
+
+  frontend:
+    image: node:20-alpine
+    container_name: projeto_frontend
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: http://150.230.70.134:3001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
